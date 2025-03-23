@@ -1,0 +1,7 @@
+[udp2tcp]
+mode = "client"
+n_mux = 1
+tcp_url = "127.0.0.1:10000"
+udp_listen_addr = "127.0.0.1:40000"
+udp_target_addr = "127.0.0.1:50000"
+buffer_size = 4096

@@ -1,0 +1,7 @@
+[udp2tcp]
+mode = "server"
+tcp_listen_addr = "127.0.0.1:10000"
+metric_listen_addr = "127.0.0.1:18080/metric"
+udp_target_addr = "127.0.0.1:20000"
+udp_listen_addr = "127.0.0.1:30000"
+buffer_size = 4096
