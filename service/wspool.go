@@ -20,6 +20,7 @@ type TCPConnection struct {
 	heartbeat  chan bool
 	ID         int
 	needRedial bool
+	Timeout    time.Duration
 }
 
 type TCPConnectionPool struct {
@@ -48,11 +49,11 @@ func (conn *TCPConnection) Dial() {
 		if conn.conn != nil {
 			conn.conn.Close()
 		}
-		tConn, err := net.Dial("tcp", conn.TCPURL)
+		tConn, err := net.DialTimeout("tcp", conn.TCPURL, conn.Timeout)
 		for err != nil {
 			log.Printf("Connection: %d, failed to re-dial, retry in 5s: %v", conn.ID, err)
 			time.Sleep(5 * time.Second)
-			tConn, err = net.Dial("tcp", conn.TCPURL)
+			tConn, err = net.DialTimeout("tcp", conn.TCPURL, conn.Timeout)
 		}
 		log.Printf("Connection: %d, connected successfully", conn.ID)
 		conn.conn = tConn.(*net.TCPConn)
@@ -140,7 +141,7 @@ func (c *TCPConnectionPool) handleConnectionListen(conn *TCPConnection) {
 	for !conn.closing {
 		packet := c.bufferPool.Get().(*UDPPacket)
 		conn.redialM.RLock()
-		err := ReadPacket(conn.conn, packet)
+		err := ReadPacket(conn.conn, packet, conn.Timeout)
 		conn.redialM.RUnlock()
 		if err != nil {
 			log.Printf("Connection: %d, Failed to read message from TCP Connection: %v", conn.ID, err)
@@ -175,7 +176,7 @@ func (c *TCPConnectionPool) handleConnectionSent(conn *TCPConnection) {
 				return
 			}
 			conn.redialM.RLock()
-			err := SendPacket(conn.conn, packet)
+			err := SendPacket(conn.conn, packet, conn.Timeout)
 			conn.redialM.RUnlock()
 			// log.Printf("[DEBUG %s] Packet sent to Websocket", time.Now().String())
 			if err != nil {
@@ -198,7 +199,7 @@ func (c *TCPConnectionPool) handleConnectionSent(conn *TCPConnection) {
 				return
 			}
 			conn.redialM.RLock()
-			err := SendPacket(conn.conn, &UDPPacket{n: 0})
+			err := SendPacket(conn.conn, &UDPPacket{n: 0}, conn.Timeout)
 			// log.Printf("Heartbeat was sent to connection %d", conn.ID)
 			conn.redialM.RUnlock()
 			if err != nil {

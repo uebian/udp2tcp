@@ -13,8 +13,8 @@ type UDPPacket struct {
 	n       uint32
 }
 
-func ReadPacket(conn net.Conn, packet *UDPPacket) error {
-	conn.SetReadDeadline(time.Now().Add(5 * time.Second))
+func ReadPacket(conn net.Conn, packet *UDPPacket, timeout time.Duration) error {
+	conn.SetReadDeadline(time.Now().Add(timeout))
 	// Read a 4-byte length prefix to determine packet size
 	lengthBuf := make([]byte, 4)
 	_, err := io.ReadFull(conn, lengthBuf)
@@ -42,8 +42,8 @@ func ReadPacket(conn net.Conn, packet *UDPPacket) error {
 	return nil
 }
 
-func SendPacket(conn net.Conn, packet *UDPPacket) error {
-	conn.SetWriteDeadline(time.Now().Add(5 * time.Second))
+func SendPacket(conn net.Conn, packet *UDPPacket, timeout time.Duration) error {
+	conn.SetWriteDeadline(time.Now().Add(timeout))
 	lengthBuf := make([]byte, 4)
 	binary.BigEndian.PutUint32(lengthBuf, uint32(packet.n))
 

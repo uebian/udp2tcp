@@ -12,6 +12,7 @@ type Config struct {
 	BufferSize       int    `mapstructure:"buffer_size"`
 	TCPListenAddr    string `mapstructure:"tcp_listen_addr"`
 	MetricListenAddr string `mapstructure:"metric_listen_addr"`
+	Timeout          int    `mapstructure:"timeout"` // in milliseconds
 }
 
 func New() *Config {

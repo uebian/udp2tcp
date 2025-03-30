@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"net"
+	"time"
 
 	//_ "net/http/pprof"
 
@@ -62,6 +63,10 @@ func (s *Server) ListenAndServe() {
 			continue
 		}
 		conn.(*net.TCPConn).SetNoDelay(true)
-		go s.wspool.NewConnection(&TCPConnection{conn: conn.(*net.TCPConn), ID: s.NextConnectionID()})
+		go s.wspool.NewConnection(&TCPConnection{
+			conn:    conn.(*net.TCPConn),
+			ID:      s.NextConnectionID(),
+			Timeout: time.Duration(s.cfg.Timeout) * time.Millisecond,
+		})
 	}
 }

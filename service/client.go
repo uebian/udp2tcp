@@ -2,6 +2,7 @@ package service
 
 import (
 	"net"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/uebian/udp2tcp/config"
@@ -41,7 +42,10 @@ func (c *Client) Init() error {
 	prometheus.MustRegister(c.wspool.Collector)
 
 	for i := range c.cfg.NMux {
-		err = c.wspool.NewConnection(&TCPConnection{TCPURL: c.cfg.TCPURL, ID: i})
+		err = c.wspool.NewConnection(&TCPConnection{
+			TCPURL:  c.cfg.TCPURL,
+			ID:      i,
+			Timeout: time.Duration(c.cfg.Timeout) * time.Millisecond})
 		if err != nil {
 			return err
 		}

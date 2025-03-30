@@ -45,6 +45,10 @@ var (
 				cfg.NMux = nMux
 			}
 
+			if timeout, _ := cmd.Flags().GetInt("timeout"); cfg.Timeout > 0 {
+				cfg.Timeout = timeout
+			}
+
 			cfg.BufferSize, _ = cmd.Flags().GetInt("buffer-size")
 
 			// Verify required configuration is present
@@ -150,6 +154,7 @@ func init() {
 	rootCmd.Flags().String("tcp-url", "", "TCP server URL to connect to (e.g., tcp://example.com:8080)")
 	rootCmd.Flags().Int("n-mux", 0, "Number of multiplexed connections to use")
 	rootCmd.Flags().Int("buffer-size", 1024, "Size of buffer to use for reading UDP")
+	rootCmd.Flags().Int("timeout", 5000, "Timeout in milliseconds for TCP connections")
 
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
